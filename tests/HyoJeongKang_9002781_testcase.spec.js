@@ -99,7 +99,7 @@ test('User Login Flow', async ({ page }) => {
   await page.fill('input[data-qa="login-password"]', 'test123123');
   await page.click('button[data-qa="login-button"]');
   console.log('Login button clicked');
-  await expect(page.locator('a[href="/logout"]')).toBeVisible();
+  await expect(page.locator('div.header-middle a[href="/logout"]')).toBeVisible();
 });
 
 // Test Case 3: Delete Account
@@ -109,7 +109,7 @@ test('Delete Account', async ({ page }) => {
   await page.fill('input[data-qa="login-password"]', 'test123123');
   await page.click('button[data-qa="login-button"]');
   console.log('Logged in');
-  await page.click('a[href="/delete_account"]');
+  await page.click('div.header-middle a[href="/delete_account"]');
   await expect(page.locator('div.row h2 b')).toContainText('Account Deleted!');
 });
 
@@ -175,9 +175,16 @@ test('Checkout Flow', async ({ page }) => {
   
   console.log('Delivery address:', delivery_addr);
   
-  expect(
-	delivery_addr.some(addr => addr.includes('PROG8173 Conestoga St.'))
-	).toBe(true);
+  // ensure it's not empty or undefined
+expect(Array.isArray(delivery_addr)).toBe(true);
+
+// check that at least one item includes the string
+const hasAddress = delivery_addr.some(addr =>
+  addr.includes('PROG8173 Conestoga St.')
+);
+
+expect(hasAddress).toBe(true);
+  
 });
 
 // Test Case 8: Fill Contact Us Form
