@@ -155,3 +155,72 @@ test('Add Product to Cart', async ({ page }) => {
 });
 
 
+// Test Case 7: Checkout Flow
+test('Checkout Flow', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/login');
+  console.log('On login page');
+  await page.fill('input[data-qa="login-email"]', 'testuser000@example.com');
+  await page.fill('input[data-qa="login-password"]', 'test123123');
+  await page.click('button[data-qa="login-button"]');
+  console.log('Login button clicked');
+  await page.click('div.header-middle a[href="/products"]')
+  await page.hover('div.single-products');
+  await page.click('div.product-overlay .overlay-content a[data-product-id="1"]');
+  console.log('Product added to cart');
+  await page.click('#cartModal a[href="/view_cart"]'); // View Cart
+  console.log('Navigating to cart');
+  await page.click('.btn.btn-default.check_out');
+  
+  const delivery_addr = await page.locator('div.checkout-information #address_delivery li.address_address1.address_address2').allTextContents();
+  
+  console.log('Delivery address:', delivery_addr);
+  
+  expect(
+	delivery_addr.some(addr => addr.includes('PROG8173 Conestoga St.'))
+	).toBe(true);
+});
+
+// Test Case 8: Fill Contact Us Form
+test('Contact Us Form Submission', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/contact_us');
+  
+  // popup handler -> OK button
+  page.on('dialog', async dialog => {
+    console.log('popup content:', dialog.message());
+    await dialog.accept();
+  });
+  
+  await page.fill('[data-qa="name"]', 'TestUser000');
+  await page.fill('[data-qa="email"]', 'testuser000@example.com');
+  await page.fill('[data-qa="subject"]', 'Test Subject');
+  await page.fill('[data-qa="message"]', 'This is a test message.');
+  await page.click('input[data-qa="submit-button"]');
+    
+  console.log('Form submitted');
+  await expect(page.locator('.contact-form .status')).toContainText('Success! Your details have been submitted successfully.');
+});
+
+// Test Case 9: Navigate Slider
+test('Homepage Slider Navigation', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com');
+  await page.click('#slider-carousel .fa-angle-right');
+  console.log('Slider clicked');
+  await expect(page.locator('.carousel-indicators')).toBeVisible();
+});
+
+// Test Case 10: Verify Ads Displayed
+test('Verify Ads on Home Page', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com');
+  
+  const adCount = await page.locator('ins.adsbygoogle.adsbygoogle-noablate').count();
+  console.log('Ads found:', adCount);
+
+	const visibleAds = page.locator('ins.adsbygoogle.adsbygoogle-noablate').filter({
+	  has: page.locator(':visible')
+	});
+
+	const visibleCount = await visibleAds.count();
+	console.log('visibleCount:', visibleCount);
+	expect(visibleCount).toBeGreaterThan(0); 
+});
+
