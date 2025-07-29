@@ -90,3 +90,68 @@ test('User Signup Flow', async ({ page }) => {
 	expect(passed).toBe(true);
 });
 
+
+// Test Case 2: User Login
+test('User Login Flow', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/login');
+  console.log('On login page');
+  await page.fill('input[data-qa="login-email"]', 'testuser000@example.com');
+  await page.fill('input[data-qa="login-password"]', 'test123123');
+  await page.click('button[data-qa="login-button"]');
+  console.log('Login button clicked');
+  await expect(page.locator('a[href="/logout"]')).toBeVisible();
+});
+
+// Test Case 3: Delete Account
+test('Delete Account', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/login');
+  await page.fill('input[data-qa="login-email"]', 'testuser000@example.com');
+  await page.fill('input[data-qa="login-password"]', 'test123123');
+  await page.click('button[data-qa="login-button"]');
+  console.log('Logged in');
+  await page.click('a[href="/delete_account"]');
+  await expect(page.locator('div.row h2 b')).toContainText('Account Deleted!');
+});
+
+// Test Case 4: View Products
+test('View All Products', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/products');
+  console.log('On products page');
+  
+  const productNames = await page.locator('.features_items .productinfo.text-center p').allTextContents();
+
+  console.log('productNames:');
+  console.log(productNames);
+  
+  await expect(page.locator('.features_items')).toBeVisible();
+});
+
+// Test Case 5: Search Product
+test('Search Product by Name', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/products');
+  await page.fill('#search_product', 'dress');
+  await page.click('#submit_search');
+  console.log('Search submitted');
+  const count = await page.locator('div.productinfo.text-center p').count();
+	
+	console.log('p tag count: ', count);
+	
+	const productNames = await page.locator('div.productinfo.text-center p').allTextContents();
+
+  console.log('Search results:');
+  console.log(productNames);
+
+  expect(count).toBeGreaterThan(0);
+});
+
+// Test Case 6: Add Product to Cart
+test('Add Product to Cart', async ({ page }) => {
+  await page.goto('https://www.automationexercise.com/products');
+  await page.hover('.single-products');
+  await page.click('.product-overlay a[data-product-id="1"]');
+  console.log('Product added to cart');
+  await expect(page.locator('#cartModal .modal-body p').first()).toContainText('Your product has been added to cart.');
+  
+});
+
+
